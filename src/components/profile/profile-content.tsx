@@ -39,7 +39,7 @@ export default function ProfileContent({ initialProfile, stats }: ProfileContent
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setEditedProfile(prev => ({ ...prev, [name]: value }));
+    setEditedProfile((prev: any) => ({ ...prev, [name]: value }));
   };
 
   const handleAvatarClick = () => {
