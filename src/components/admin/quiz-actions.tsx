@@ -3,11 +3,6 @@
 import { useState } from 'react';
 import { Trash2, Edit3, Loader2 } from 'lucide-react';
 import { 
-  AlertDialog, AlertDialogAction, AlertDialogCancel, 
-  AlertDialogContent, AlertDialogDescription, 
-  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle 
-} from '@/components/ui/alert-dialog';
-import { 
   Dialog, DialogContent, DialogHeader, DialogTitle 
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
