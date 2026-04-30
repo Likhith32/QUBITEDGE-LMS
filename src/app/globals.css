@@ -1,26 +1,183 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
+/* ═══ Tailwind v4 Theme ═══ */
 @theme inline {
+  /* Shadcn mapped colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-heading: 'Playfair Display', ui-serif, Georgia, serif;
+  --font-serif: 'Playfair Display', ui-serif, Georgia, serif;
+
+  /* Custom Palette */
+  --color-primary: #4A5DB5;
+  --color-primary-dark: #2238A4;
+  --color-secondary: #7182C7;
+  --color-muted-blue: #A0ACDC;
+
+  /* Shadcn base tokens */
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary-shad: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+
+  /* Radius */
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ═══ Root Variables — Modern SaaS Blue ═══ */
+:root {
+  --background: #E9EEF9;
+  --foreground: #1A1A2E;
+  --card: #FFFFFF;
+  --card-foreground: #1A1A2E;
+  --popover: #FFFFFF;
+  --popover-foreground: #1A1A2E;
+  --primary: #4A5DB5;
+  --primary-foreground: #FFFFFF;
+  --secondary: #7182C7;
+  --secondary-foreground: #FFFFFF;
+  --muted: #A0ACDC;
+  --muted-foreground: #4A5DB5;
+  --accent: #2238A4;
+  --accent-foreground: #FFFFFF;
+  --destructive: #D95F5F;
+  --border: rgba(34, 56, 164, 0.1);
+  --input: rgba(34, 56, 164, 0.1);
+  --ring: #4A5DB5;
+  --radius: 1rem;
+  
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #1A1A2E;
+  --sidebar-primary: #4A5DB5;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: rgba(74, 93, 181, 0.08);
+  --sidebar-accent-foreground: #2238A4;
+  --sidebar-border: rgba(34, 56, 164, 0.1);
+  --sidebar-ring: #4A5DB5;
+}
+
+/* ═══ Base Styles ═══ */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+  html {
+    @apply font-sans scroll-smooth;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', ui-serif, Georgia, serif;
+    @apply text-slate-900;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ═══ Premium Component Utilities ═══ */
+.qe-card {
+  @apply bg-white/70 backdrop-blur-md border border-white/40 shadow-xl rounded-[2.5rem] transition-all duration-500 overflow-hidden;
+}
+
+.qe-card-hover {
+  @apply hover:shadow-[0_20px_50px_rgba(34,56,164,0.12)] hover:bg-white/90 hover:border-blue-200/50 hover:-translate-y-2;
+}
+
+/* Animated Background Mesh */
+.bg-mesh {
+  background-color: #E9EEF9;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(74, 93, 181, 0.1) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(34, 56, 164, 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(113, 130, 199, 0.1) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(160, 172, 220, 0.05) 0px, transparent 50%);
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.bg-glow {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(34, 56, 164, 0.08) 0%, transparent 70%);
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: -1;
+  animation: bg-float 20s infinite alternate ease-in-out;
+}
+
+@keyframes bg-float {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(10%, 10%); }
+}
+
+.btn-primary {
+  @apply bg-[#4A5DB5] hover:bg-[#2238A4] text-white rounded-2xl font-black transition-all active:scale-95 shadow-xl shadow-blue-900/10;
+}
+
+.btn-secondary {
+  @apply bg-white text-[#4A5DB5] border-2 border-[#4A5DB5]/10 hover:border-[#4A5DB5]/30 rounded-2xl font-black transition-all active:scale-95 shadow-sm;
+}
+
+/* ═══ Badge Variants — Updated to SaaS Theme ═══ */
+.badge-streak {
+  @apply bg-gradient-to-r from-[#7182C7] to-[#2238A4] text-white font-bold px-3 py-1 rounded-full text-xs;
+}
+.badge-rank {
+  @apply bg-[#A0ACDC]/20 text-[#2238A4] border border-[#A0ACDC]/40 font-bold px-3 py-1 rounded-full text-xs;
+}
+.badge-pending {
+  @apply bg-amber-100 text-amber-700 border border-amber-200 font-bold px-2.5 py-0.5 rounded-lg text-[10px];
+}
+.badge-approved {
+  @apply bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold px-2.5 py-0.5 rounded-lg text-[10px];
+}
+.badge-rejected {
+  @apply bg-rose-100 text-rose-700 border border-rose-200 font-bold px-2.5 py-0.5 rounded-lg text-[10px];
+}
+.badge-locked {
+  @apply bg-slate-100 text-slate-400 border border-slate-200 border-dashed font-bold px-2.5 py-0.5 rounded-lg text-[10px];
+}
+
+/* ═══ Navigation ═══ */
+.nav-active {
+  @apply bg-[#4A5DB5]/10 text-[#2238A4] font-bold border-l-4 border-[#2238A4];
+}
+
+/* ═══ Scrollbar ═══ */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-[#A0ACDC] rounded-full border-4 border-transparent bg-clip-content;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-[#7182C7];
 }
