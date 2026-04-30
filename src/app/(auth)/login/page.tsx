@@ -4,12 +4,14 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import QubitedgeLogo from '@/components/logo';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import Image from 'next/image';
+import bgImage from '@/assets/wmremove-transformed.png';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -51,66 +53,104 @@ export default function LoginPage() {
   };
 
   return (
-    <Card className="qe-card border-none shadow-xl">
-      <CardHeader className="space-y-4 pb-6 pt-8 text-center">
-        <div className="flex justify-center mb-2">
-          <QubitedgeLogo size={64} />
-        </div>
-        <CardTitle className="text-3xl" style={{ fontFamily: 'Playfair Display' }}>
-          Welcome Back
-        </CardTitle>
-        <CardDescription>
-          Sign in to the qubitedge LMS Portal to continue your internship journey.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="pb-8">
-        <form onSubmit={handleLogin} className="space-y-5">
-          <div className="space-y-2">
-            <Label htmlFor="email" style={{ color: '#7A7268' }}>Email Address</Label>
-            <Input 
-              id="email" 
-              type="email" 
-              placeholder="name@qubitedge.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="rounded-xl border-[1.5px]"
-              style={{ borderColor: 'rgba(201,168,130,0.4)', background: '#FAFAFA' }}
-              disabled={isLoading}
-            />
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, ease: 'easeOut' }}
+      className="flex flex-col md:flex-row w-full bg-white rounded-[2.5rem] shadow-2xl overflow-hidden min-h-[620px]"
+    >
+      {/* Left Side: Image & Message */}
+      <div className="hidden md:flex md:w-1/2 relative overflow-hidden group">
+        <Image 
+          src={bgImage}
+          alt="Login Background"
+          fill
+          className="object-cover transition-transform duration-700 group-hover:scale-105"
+          priority
+        />
+        <div className="absolute inset-0 bg-black/5" />
+      </div>
+
+      {/* Right Side: Login Form */}
+      <div className="w-full md:w-1/2 p-10 lg:p-16 flex flex-col justify-center">
+        <div className="max-w-md mx-auto w-full space-y-8">
+          <div className="flex flex-col items-center text-center space-y-4">
+            <motion.div
+              initial={{ opacity: 0, rotate: -10 }}
+              animate={{ opacity: 1, rotate: 0 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+            >
+              <QubitedgeLogo size={64} />
+            </motion.div>
+            <div className="space-y-2">
+              <h1 className="text-3xl font-black text-[#1A1A2E]" style={{ fontFamily: 'Playfair Display' }}>
+                Welcome Back
+              </h1>
+              <p className="text-sm font-bold text-[#7182C7] max-w-[300px]">
+                Sign in to the qubitedge LMS Portal to continue your internship journey.
+              </p>
+            </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="password" style={{ color: '#7A7268' }}>Password</Label>
-            <Input 
-              id="password" 
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="rounded-xl border-[1.5px]"
-              style={{ borderColor: 'rgba(201,168,130,0.4)', background: '#FAFAFA' }}
+
+          <form onSubmit={handleLogin} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-xs font-black uppercase tracking-widest text-[#1A1A2E]/60 ml-1">
+                Email Address
+              </Label>
+              <Input 
+                id="email" 
+                type="email" 
+                placeholder="name@qubitedge.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="h-14 rounded-2xl border-slate-100 bg-slate-50/50 font-bold px-6 focus:ring-4 focus:ring-blue-50 transition-all"
+                disabled={isLoading}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <div className="flex justify-between items-center px-1">
+                <Label htmlFor="password" className="text-xs font-black uppercase tracking-widest text-[#1A1A2E]/60">
+                  Password
+                </Label>
+                <button type="button" className="text-xs font-black text-blue-500 hover:text-blue-600 transition-colors">
+                  Forgot Password?
+                </button>
+              </div>
+              <Input 
+                id="password" 
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="h-14 rounded-2xl border-slate-100 bg-slate-50/50 font-bold px-6 focus:ring-4 focus:ring-blue-50 transition-all"
+                disabled={isLoading}
+              />
+            </div>
+
+            <Button 
+              type="submit" 
+              className="w-full h-14 rounded-2xl bg-[#4A5DB5] hover:bg-[#2238A4] text-white font-black text-lg shadow-xl shadow-blue-500/20 transition-all hover:scale-[1.02] active:scale-[0.98] mt-4" 
               disabled={isLoading}
-            />
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Signing in...
+                </>
+              ) : (
+                'Sign In'
+              )}
+            </Button>
+          </form>
+          
+          <div className="pt-4 text-center">
+            <p className="text-sm font-bold text-[#7182C7]">
+              Don't have an account? <span className="text-[#1A1A2E]">Contact your administrator.</span>
+            </p>
           </div>
-          <Button 
-            type="submit" 
-            className="w-full btn-primary h-12 text-md mt-2" 
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Signing in...
-              </>
-            ) : (
-              'Sign In'
-            )}
-          </Button>
-        </form>
-        
-        <div className="mt-6 text-center text-sm" style={{ color: '#7A7268' }}>
-          <p>Don't have an account? Contact your administrator.</p>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </motion.div>
   );
 }
