@@ -44,11 +44,11 @@ export default function SubmissionReviewDialog({ submission }: { submission: any
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
+      <DialogTrigger render={
         <Button variant="ghost" size="sm" className="h-8 px-2 text-[#40C4D0] hover:text-[#32B0BC] hover:bg-[#40C4D0]/10">
           <Eye size={16} className="mr-1" /> View
         </Button>
-      </DialogTrigger>
+      } />
       <DialogContent className="sm:max-w-[600px] rounded-2xl border-none p-0 overflow-hidden">
         <DialogHeader className="p-6 pb-0">
           <DialogTitle className="text-xl font-bold" style={{ fontFamily: 'Playfair Display', color: '#2C2C2C' }}>
