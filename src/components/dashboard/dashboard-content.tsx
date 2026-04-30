@@ -1,11 +1,12 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Flame, Target, CalendarCheck, Trophy } from 'lucide-react';
+import { Flame, Target, CalendarCheck, Trophy, Sparkles, Binary, Cpu, ChevronRight } from 'lucide-react';
 import AnnouncementStrip from '@/components/dashboard/announcement-strip';
 import StatCard from '@/components/dashboard/stat-card';
 import QuickActions from '@/components/dashboard/quick-actions';
 import ActivityFeed from '@/components/dashboard/activity-feed';
+import { Button } from '@/components/ui/button';
 
 interface DashboardContentProps {
   profile: any;
@@ -19,6 +20,7 @@ interface DashboardContentProps {
   hasAttemptedTodayQuiz: boolean;
   activities: any[];
   totalExpectedDays: number;
+  showPreviousWorks: boolean;
 }
 
 export default function DashboardContent({
@@ -33,6 +35,7 @@ export default function DashboardContent({
   hasAttemptedTodayQuiz,
   activities,
   totalExpectedDays,
+  showPreviousWorks,
 }: DashboardContentProps) {
   return (
     <div className="relative pb-20">
@@ -92,13 +95,72 @@ export default function DashboardContent({
           />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+          <div className="lg:col-span-2 space-y-8">
             <QuickActions 
               hasMarkedAttendance={!!todayAttendance} 
               todayDayId={todayDay?.id}
               hasAttemptedTodayQuiz={hasAttemptedTodayQuiz}
             />
+
+            {/* Previous Works Section */}
+            {showPreviousWorks && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="space-y-6"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600">
+                    <Sparkles size={20} />
+                  </div>
+                  <h2 className="text-2xl font-black text-[#1A1A2E]">Previous Workshops</h2>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <motion.div 
+                    whileHover={{ y: -5 }}
+                    className="p-8 rounded-[2.5rem] bg-white border border-slate-100 shadow-xl hover:shadow-2xl transition-all group overflow-hidden relative"
+                  >
+                    <div className="relative z-10">
+                      <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-500 mb-6 group-hover:scale-110 transition-transform">
+                        <Binary size={24} />
+                      </div>
+                      <h3 className="text-xl font-black text-[#1A1A2E] mb-2">Data Science Mastery</h3>
+                      <p className="text-sm font-bold text-[#7182C7] mb-6">Explore the depths of predictive modeling and neural networks.</p>
+                      <Button variant="ghost" className="p-0 h-auto font-black text-blue-500 hover:bg-transparent flex items-center group-hover:gap-2 transition-all">
+                        View Resources <ChevronRight size={18} />
+                      </Button>
+                    </div>
+                    <div className="absolute -bottom-10 -right-10 opacity-5 group-hover:opacity-10 transition-opacity">
+                      <Binary size={120} />
+                    </div>
+                  </motion.div>
+
+                  <motion.div 
+                    whileHover={{ y: -5 }}
+                    className="p-8 rounded-[2.5rem] bg-white border border-slate-100 shadow-xl hover:shadow-2xl transition-all group overflow-hidden relative"
+                  >
+                    <div className="relative z-10">
+                      <div className="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center text-purple-500 mb-6 group-hover:scale-110 transition-transform">
+                        <Cpu size={24} />
+                      </div>
+                      <h3 className="text-xl font-black text-[#1A1A2E] mb-2">Quantum Computing</h3>
+                      <p className="text-sm font-bold text-[#7182C7] mb-6">Introduction to qubits, superposition, and quantum algorithms.</p>
+                      <a href="https://youtu.be/zsQ6ieXahg8?si=OtsG_c66PGeAOGhk" target="_blank" rel="noopener noreferrer">
+                        <Button variant="ghost" className="p-0 h-auto font-black text-purple-500 hover:bg-transparent flex items-center group-hover:gap-2 transition-all">
+                          View Resources <ChevronRight size={18} />
+                        </Button>
+                      </a>
+                    </div>
+                    <div className="absolute -bottom-10 -right-10 opacity-5 group-hover:opacity-10 transition-opacity">
+                      <Cpu size={120} />
+                    </div>
+                  </motion.div>
+                </div>
+              </motion.div>
+            )}
           </div>
           <div className="lg:col-span-1">
             <ActivityFeed activities={activities} />

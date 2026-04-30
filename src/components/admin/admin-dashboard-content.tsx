@@ -1,22 +1,50 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Users, FileText, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Users, FileText, CheckCircle2, AlertCircle, Settings, Eye, EyeOff, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import StatCard from '@/components/dashboard/stat-card';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
+import { toast } from 'sonner';
 
 interface AdminDashboardContentProps {
   usersCount: number;
   submissionsCount: number;
   pendingCount: number;
+  showPreviousWorks: boolean;
 }
 
 export default function AdminDashboardContent({
   usersCount,
   submissionsCount,
   pendingCount,
+  showPreviousWorks: initialShowPreviousWorks,
 }: AdminDashboardContentProps) {
+  const [showWorks, setShowWorks] = useState(initialShowPreviousWorks);
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const togglePreviousWorks = async (checked: boolean) => {
+    setIsUpdating(true);
+    try {
+      const res = await fetch('/api/admin/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: 'show_previous_works', value: checked }),
+      });
+
+      if (!res.ok) throw new Error('Failed to update setting');
+      
+      setShowWorks(checked);
+      toast.success(`Previous Works section is now ${checked ? 'visible' : 'hidden'} to interns.`);
+    } catch (error) {
+      toast.error('Failed to update setting');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   return (
     <div className="relative pb-10">
       {/* Premium Background Effects */}
@@ -27,7 +55,7 @@ export default function AdminDashboardContent({
         animate={{ opacity: 1, y: 0 }}
         className="relative z-10"
       >
-        <div className="mb-10">
+        <div className="mb-10 text-center md:text-left">
           <h1 className="text-5xl font-black mb-3 tracking-tight" style={{ fontFamily: 'Playfair Display', color: '#1A1A2E' }}>
             Admin Command Center
           </h1>
@@ -57,8 +85,8 @@ export default function AdminDashboardContent({
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <Card className="rounded-[2.5rem] bg-white/70 backdrop-blur-xl border border-white/40 shadow-xl overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <Card className="lg:col-span-2 rounded-[2.5rem] bg-white/70 backdrop-blur-xl border border-white/40 shadow-xl overflow-hidden">
             <CardHeader className="pb-2">
               <CardTitle className="text-2xl font-black text-[#1A1A2E]">Operations</CardTitle>
             </CardHeader>
@@ -115,6 +143,39 @@ export default function AdminDashboardContent({
               </Link>
             </CardContent>
           </Card>
+
+          <div className="space-y-8">
+            <Card className="rounded-[2.5rem] bg-white border border-slate-100 shadow-xl overflow-hidden">
+              <CardHeader className="bg-[#1A1A2E] text-white p-6">
+                <div className="flex items-center gap-3">
+                  <Settings size={20} />
+                  <CardTitle className="text-xl font-black">Platform Settings</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="p-8 space-y-6">
+                <div className="flex items-center justify-between p-6 rounded-3xl bg-slate-50 border border-slate-100">
+                  <div className="flex items-center gap-4">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${showWorks ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-200 text-slate-500'}`}>
+                      {showWorks ? <Eye size={20} /> : <EyeOff size={20} />}
+                    </div>
+                    <div>
+                      <p className="font-black text-[#1A1A2E] text-sm">Previous Works</p>
+                      <p className="text-[10px] font-bold text-[#7182C7]">Toggle visibility for interns</p>
+                    </div>
+                  </div>
+                  {isUpdating ? (
+                    <Loader2 size={20} className="animate-spin text-[#4A5DB5]" />
+                  ) : (
+                    <Switch 
+                      checked={showWorks} 
+                      onCheckedChange={togglePreviousWorks}
+                      className="data-[state=checked]:bg-[#4A5DB5]"
+                    />
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </motion.div>
     </div>

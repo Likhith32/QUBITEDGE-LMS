@@ -134,6 +134,20 @@ CREATE TABLE IF NOT EXISTS announcements (
   is_active BOOLEAN DEFAULT TRUE
 );
 
+-- =====================
+-- SITE SETTINGS
+-- =====================
+CREATE TABLE IF NOT EXISTS site_settings (
+  key TEXT PRIMARY KEY,
+  value JSONB NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Initial Settings
+INSERT INTO site_settings (key, value)
+VALUES ('show_previous_works', 'true'::jsonb)
+ON CONFLICT (key) DO NOTHING;
+
 -- ═══════════════════════════════════════════════════════
 -- ROW LEVEL SECURITY
 -- ═══════════════════════════════════════════════════════
@@ -147,6 +161,7 @@ ALTER TABLE attendance ENABLE ROW LEVEL SECURITY;
 ALTER TABLE tasks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE submissions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE announcements ENABLE ROW LEVEL SECURITY;
+ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
 
 -- =====================
 -- DROP OLD POLICIES (SAFE)
@@ -255,6 +270,13 @@ CREATE POLICY "announcements_select_all" ON announcements FOR SELECT TO authenti
 CREATE POLICY "announcements_admin_write" ON announcements FOR ALL TO authenticated
   USING (is_admin());
 
+-- =====================
+-- SITE SETTINGS
+-- =====================
+CREATE POLICY "site_settings_select_all" ON site_settings FOR SELECT TO authenticated USING (true);
+CREATE POLICY "site_settings_admin_write" ON site_settings FOR ALL TO authenticated
+  USING (is_admin());
+
 -- ═══════════════════════════════════════════════════════
 -- STORAGE
 -- ═══════════════════════════════════════════════════════
@@ -273,3 +295,10 @@ WITH CHECK (bucket_id = 'submissions');
 CREATE POLICY "submissions_bucket_select"
 ON storage.objects FOR SELECT TO authenticated
 USING (bucket_id = 'submissions');
+
+-- =====================
+-- SEED DATA
+-- =====================
+INSERT INTO site_settings (key, value)
+VALUES ('show_previous_works', 'true'::jsonb)
+ON CONFLICT (key) DO NOTHING;

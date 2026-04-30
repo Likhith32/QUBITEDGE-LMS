@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus, Loader2, UserPlus, Mail, ShieldCheck, Lock } from 'lucide-react';
+import { Plus, Loader2, UserPlus, Mail, ShieldCheck, Lock, ChevronDown } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -111,17 +112,19 @@ export default function UserCreateDialog() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black text-[#7182C7] uppercase tracking-widest px-2">Category</Label>
-                  <div className="relative">
-                    <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A0ACDC]" size={18} />
-                    <Input 
-                      name="domain"
-                      value={formData.domain} 
-                      onChange={handleChange} 
-                      required
-                      placeholder="e.g. Paid Intern"
-                      className="h-14 rounded-2xl border-slate-200 bg-slate-50/50 pl-12 font-bold focus:bg-white transition-all"
-                    />
-                  </div>
+                  <Select 
+                    onValueChange={(value) => setFormData({ ...formData, domain: value || '' })}
+                    defaultValue={formData.domain}
+                  >
+                    <SelectTrigger className="h-14 rounded-2xl border-slate-200 bg-slate-50/50 pl-12 font-bold focus:bg-white transition-all relative">
+                      <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A0ACDC]" size={18} />
+                      <SelectValue placeholder="Select Type" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-2xl border-none shadow-2xl bg-white p-2">
+                      <SelectItem value="Paid Intern" className="rounded-xl font-bold py-3 hover:bg-slate-50">Paid Intern</SelectItem>
+                      <SelectItem value="Intern" className="rounded-xl font-bold py-3 hover:bg-slate-50">Standard Intern</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="space-y-2">

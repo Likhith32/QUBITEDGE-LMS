@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Trash2, Edit3, MoreVertical, Loader2 } from 'lucide-react';
+import { Trash2, Edit3, MoreVertical, Loader2, User, Mail, Shield, Lock } from 'lucide-react';
 import { 
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, 
   DropdownMenuTrigger, DropdownMenuSeparator 
@@ -11,6 +11,9 @@ import {
   DialogFooter, DialogHeader, DialogTitle 
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
@@ -20,21 +23,27 @@ interface UserActionsProps {
     id: string;
     full_name: string;
     email: string;
+    domain?: string;
   };
 }
 
 export default function UserActions({ user }: UserActionsProps) {
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [editData, setEditData] = useState({
+    full_name: user.full_name,
+    email: user.email,
+    domain: user.domain || 'Intern',
+    password: '',
+  });
+
   const router = useRouter();
 
   const handleDelete = async () => {
     setIsDeleting(true);
-    const supabase = createClient();
-
     try {
-      // Note: In a real app, deleting a user usually requires an admin API 
-      // because profiles are linked to auth.users.
       const res = await fetch(`/api/admin/delete-user?id=${user.id}`, {
         method: 'DELETE',
       });
@@ -54,6 +63,33 @@ export default function UserActions({ user }: UserActionsProps) {
     }
   };
 
+  const handleUpdate = async () => {
+    setIsUpdating(true);
+    try {
+      const res = await fetch('/api/admin/update-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: user.id,
+          ...editData,
+        }),
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || 'Failed to update user');
+      }
+
+      toast.success('Profile updated successfully.');
+      setShowEditDialog(false);
+      router.refresh();
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   return (
     <>
       <DropdownMenu>
@@ -67,7 +103,7 @@ export default function UserActions({ user }: UserActionsProps) {
         <DropdownMenuContent align="end" className="w-48 rounded-2xl p-2 shadow-2xl border-none bg-white">
           <DropdownMenuItem 
             className="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-slate-50 text-[#1A1A2E] font-bold transition-colors"
-            onClick={() => toast.info('Edit functionality coming soon!')}
+            onClick={() => setShowEditDialog(true)}
           >
             <Edit3 size={16} className="text-[#4A5DB5]" />
             Edit Profile
@@ -83,6 +119,87 @@ export default function UserActions({ user }: UserActionsProps) {
         </DropdownMenuContent>
       </DropdownMenu>
 
+      {/* Edit Dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden rounded-[3rem] border-none bg-white shadow-2xl">
+          <div className="h-24 bg-gradient-to-br from-[#4A5DB5] to-[#1A1A2E] flex items-center px-10">
+            <DialogTitle className="text-2xl font-black text-white">Edit Intern Profile</DialogTitle>
+          </div>
+          <div className="p-10 space-y-6">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black text-[#7182C7] uppercase tracking-widest px-2">Full Name</Label>
+                <div className="relative">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A0ACDC]" size={18} />
+                  <Input 
+                    value={editData.full_name}
+                    onChange={(e) => setEditData({...editData, full_name: e.target.value})}
+                    className="h-14 rounded-2xl border-slate-200 bg-slate-50/50 pl-12 font-bold focus:bg-white transition-all"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black text-[#7182C7] uppercase tracking-widest px-2">Email Address</Label>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A0ACDC]" size={18} />
+                  <Input 
+                    value={editData.email}
+                    onChange={(e) => setEditData({...editData, email: e.target.value})}
+                    className="h-14 rounded-2xl border-slate-200 bg-slate-50/50 pl-12 font-bold focus:bg-white transition-all"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black text-[#7182C7] uppercase tracking-widest px-2">Category</Label>
+                <Select 
+                  onValueChange={(val) => setEditData({...editData, domain: val || ''})}
+                  defaultValue={editData.domain}
+                >
+                  <SelectTrigger className="h-14 rounded-2xl border-slate-200 bg-slate-50/50 pl-12 font-bold focus:bg-white transition-all relative">
+                    <Shield className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A0ACDC]" size={18} />
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-2xl border-none shadow-2xl bg-white p-2">
+                    <SelectItem value="Paid Intern" className="rounded-xl font-bold py-3 hover:bg-slate-50">Paid Intern</SelectItem>
+                    <SelectItem value="Intern" className="rounded-xl font-bold py-3 hover:bg-slate-50">Standard Intern</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black text-[#7182C7] uppercase tracking-widest px-2">Reset Password (Optional)</Label>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A0ACDC]" size={18} />
+                  <Input 
+                    type="password"
+                    placeholder="New password (min 6 chars)"
+                    value={editData.password}
+                    onChange={(e) => setEditData({...editData, password: e.target.value})}
+                    className="h-14 rounded-2xl border-slate-200 bg-slate-50/50 pl-12 font-bold focus:bg-white transition-all"
+                  />
+                </div>
+              </div>
+            </div>
+            <DialogFooter className="gap-3 pt-4">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowEditDialog(false)}
+                className="h-14 flex-1 rounded-2xl border-slate-200 font-black text-[#7182C7]"
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleUpdate}
+                disabled={isUpdating}
+                className="h-14 flex-1 rounded-2xl bg-[#4A5DB5] hover:bg-[#2238A4] text-white font-black shadow-xl shadow-blue-500/20"
+              >
+                {isUpdating ? <Loader2 className="animate-spin" /> : 'Save Changes'}
+              </Button>
+            </DialogFooter>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation */}
       <Dialog open={showDeleteAlert} onOpenChange={setShowDeleteAlert}>
         <DialogContent className="rounded-[2.5rem] p-10 border-none bg-white shadow-2xl">
           <DialogHeader>

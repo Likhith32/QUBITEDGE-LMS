@@ -28,7 +28,7 @@ export default async function DayDetailPage({ params }: { params: { dayId: strin
 
   if (error || !day) notFound();
 
-  const quiz = day.quizzes?.[0];
+  const quiz = day.quizzes;
 
   // Fetch attempt
   let scoreObj = null;

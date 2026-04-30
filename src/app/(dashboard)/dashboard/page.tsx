@@ -26,12 +26,20 @@ export default async function DashboardPage() {
     .order('posted_at', { ascending: false })
     .limit(3);
 
-  // 3. Fetch stats (simplified for the seed setup)
-  const [{ count: attendanceCount }, { count: quizzesCount }, { count: tasksCount }] = await Promise.all([
+  // 3. Fetch stats and settings
+  const [
+    { count: attendanceCount }, 
+    { count: quizzesCount }, 
+    { count: tasksCount },
+    { data: settings }
+  ] = await Promise.all([
     supabase.from('attendance').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
     supabase.from('scores').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
     supabase.from('submissions').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
+    supabase.from('site_settings').select('*'),
   ]);
+
+  const showPreviousWorks = settings?.find(s => s.key === 'show_previous_works')?.value || false;
 
   const totalExpectedDays = 30; // From 6 week curriculum
   const progressPercent = calculateProgress(
@@ -97,6 +105,7 @@ export default async function DashboardPage() {
       hasAttemptedTodayQuiz={hasAttemptedTodayQuiz}
       activities={activities}
       totalExpectedDays={totalExpectedDays}
+      showPreviousWorks={showPreviousWorks}
     />
   );
 }

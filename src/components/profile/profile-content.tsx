@@ -13,6 +13,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { 
+  Dialog, DialogContent, DialogDescription, 
+  DialogFooter, DialogHeader, DialogTitle 
+} from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
@@ -97,8 +101,81 @@ export default function ProfileContent({ initialProfile, stats }: ProfileContent
   // Progress calculations
   const masteryPercentage = Math.round((stats.attendanceCount / stats.totalExpectedDays) * 100) || 0;
 
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+
+  const handlePasswordUpdate = async () => {
+    if (newPassword.length < 6) {
+      toast.error('Password must be at least 6 characters');
+      return;
+    }
+
+    setIsUpdatingPassword(true);
+    try {
+      const res = await fetch('/api/profile/update-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: newPassword }),
+      });
+
+      if (!res.ok) throw new Error('Failed to update password');
+
+      toast.success('Password changed successfully!');
+      setShowPasswordDialog(false);
+      setNewPassword('');
+    } catch (error) {
+      toast.error('Failed to update password');
+    } finally {
+      setIsUpdatingPassword(false);
+    }
+  };
+
   return (
     <div className="pb-20 space-y-10">
+      {/* Password Dialog */}
+      <Dialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
+        <DialogContent className="rounded-[2.5rem] p-10 border-none bg-white shadow-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-black text-[#1A1A2E]">Change Password</DialogTitle>
+            <DialogDescription className="text-md font-bold text-[#7182C7] mt-2">
+              Enter your new desired password below.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-6 space-y-4">
+            <div className="space-y-2">
+              <Label className="text-[10px] font-black uppercase tracking-widest text-[#A0ACDC] ml-2">New Password</Label>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#4A5DB5]" size={18} />
+                <Input 
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="pl-12 h-14 rounded-2xl border-blue-50 bg-slate-50 focus:bg-white font-bold transition-all"
+                  placeholder="••••••••"
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter className="mt-8 gap-4">
+            <Button 
+              variant="outline"
+              onClick={() => setShowPasswordDialog(false)}
+              className="h-14 px-8 rounded-2xl border-slate-200 font-black text-[#7182C7]"
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handlePasswordUpdate}
+              disabled={isUpdatingPassword}
+              className="h-14 px-8 rounded-2xl bg-[#2238A4] hover:bg-[#1A1A2E] text-white font-black shadow-xl shadow-blue-900/20"
+            >
+              {isUpdatingPassword ? <Loader2 className="animate-spin" /> : 'Update Password'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Header Section */}
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
@@ -297,7 +374,11 @@ export default function ProfileContent({ initialProfile, stats }: ProfileContent
                 </div>
 
                 <div className="pt-8 grid grid-cols-2 gap-3">
-                   <Button variant="outline" className="h-12 rounded-xl border-slate-200 font-bold text-xs hover:bg-slate-50">
+                   <Button 
+                    onClick={() => setShowPasswordDialog(true)}
+                    variant="outline" 
+                    className="h-12 rounded-xl border-slate-200 font-bold text-xs hover:bg-slate-50"
+                   >
                       <Key size={14} className="mr-2" />
                       Password
                    </Button>

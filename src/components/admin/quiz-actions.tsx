@@ -20,10 +20,14 @@ import {
   DialogTitle as BaseDialogTitle 
 } from '@/components/ui/dialog';
 
+import QuizEditDialog from './quiz-edit-dialog';
+
 interface QuizActionsProps {
   quiz: {
     id: string;
     day_id: string;
+    questions: any[];
+    max_score: number;
     days: {
       day_number: number;
       topic: string;
@@ -60,12 +64,7 @@ export default function QuizActions({ quiz }: QuizActionsProps) {
 
   return (
     <div className="flex justify-end gap-2">
-      <button 
-        onClick={() => toast.info('Edit functionality coming soon!')}
-        className="p-3 rounded-xl bg-white border border-slate-100 text-[#7182C7] hover:text-[#4A5DB5] hover:border-[#4A5DB5]/30 transition-all shadow-sm"
-      >
-        <Edit3 size={18} />
-      </button>
+      <QuizEditDialog quiz={quiz} />
       <button 
         onClick={() => setShowDeleteAlert(true)}
         className="p-3 rounded-xl bg-white border border-slate-100 text-[#7182C7] hover:text-rose-500 hover:border-rose-200 transition-all shadow-sm"
