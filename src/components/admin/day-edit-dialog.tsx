@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState, ReactElement } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -22,7 +22,7 @@ interface DayEditDialogProps {
     resource_link: string | null;
     sub_topics?: string | null;
   };
-  children?: React.ReactNode;
+  children?: React.ReactElement;
 }
 
 export default function DayEditDialog({ day, children }: DayEditDialogProps) {
